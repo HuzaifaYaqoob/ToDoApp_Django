@@ -20,6 +20,8 @@ class UserView(APIView):
 
         return JsonResponse(
             {
+                'status' : 'success',
+                'status_code' : 200,
                 'user' : serialized_obj.data
             }
         )
@@ -36,6 +38,8 @@ class LoginView(APIView):
             serialized_obj = UserSerializers(user )
             return JsonResponse(
                 {
+                    'status' : 'Success',
+                    'status_code' : 200,
                     'data' : {
                         'user' : serialized_obj.data
                     }
@@ -44,6 +48,8 @@ class LoginView(APIView):
 
         return Response(
             {
+                'status' : 'Success',
+                'status_code' : 401,
                 'details' : 'Invalid Credentials'
             },
             status = status.HTTP_401_UNAUTHORIZED
