@@ -1,5 +1,6 @@
 from functools import partial
 import json
+from typing import final
 from django.db import connections
 from django.shortcuts import render
 from django.http import  JsonResponse
@@ -13,7 +14,6 @@ from rest_framework.views import APIView
 
 from .models import Todo
 from .serializers import TodoSerializers
-from ToDo import serializers
 
 # Create your views here.
 
@@ -22,15 +22,33 @@ class Todos(APIView):
 
     def get(self, request):
         all_todos = Todo.objects.filter(user=request.user )[::-1]
-        serialized_data = TodoSerializers(all_todos , many=True).data
-        print(len(serialized_data))
-        return JsonResponse(
-                {
-                    'status':'Success',
-                    'status_code' : 200,
-                    'data' : serialized_data
-                }
-            )
+        try:
+            limit = request.GET.get('_limit')
+            limit = int(limit)
+        except:
+            print('Could not get _limits')
+            serialized_data = TodoSerializers(all_todos , many=True).data
+            print(len(serialized_data))
+            return JsonResponse(
+                    {
+                        'status':'Success',
+                        'status_code' : 200,
+                        'data' : serialized_data,
+                        'total_length' : len(all_todos)
+                    }
+                )
+        else:
+            print(limit)
+            serialized_data = TodoSerializers(all_todos[0:limit] , many=True).data
+            print(len(serialized_data))
+            return JsonResponse(
+                    {
+                        'status':'Success',
+                        'status_code' : 200,
+                        'data' : serialized_data,
+                        'total_length' : len(all_todos)
+                    }
+                )
 
     def post(self, request):
         r_data = request.data
